@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Signal — talk to a stranger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="noise-overlay" aria-hidden="true"></div>
+
+<!-- ===== LANDING ===== -->
+<section id="screen-landing" class="screen screen-landing">
+  <div class="landing-inner">
+    <div class="wordmark-row">
+      <svg class="dial" width="46" height="46" viewBox="0 0 46 46" aria-hidden="true">
+        <circle cx="23" cy="23" r="21" stroke="var(--signal)" stroke-width="1.5" fill="none" opacity="0.35"/>
+        <circle cx="23" cy="23" r="14" stroke="var(--signal)" stroke-width="1.5" fill="none" opacity="0.6"/>
+        <circle cx="23" cy="23" r="3" fill="var(--amber)"/>
+        <line id="dial-needle" x1="23" y1="23" x2="23" y2="4" stroke="var(--amber)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <h1>SIGNAL</h1>
+    </div>
+    <p class="tagline">Tune in. Talk to a stranger, one line at a time.</p>
+
+    <svg class="hero-wave" viewBox="0 0 600 80" preserveAspectRatio="none" aria-hidden="true">
+      <path class="wave-path" d="M0,40 Q 25,10 50,40 T 100,40 T 150,40 T 200,40 T 250,40 T 300,40 T 350,40 T 400,40 T 450,40 T 500,40 T 550,40 T 600,40" fill="none" stroke="var(--signal)" stroke-width="2"/>
+    </svg>
+
+    <label for="interests-input" class="interests-label">Frequencies you're into <span>(optional — helps match you faster)</span></label>
+    <input id="interests-input" type="text" placeholder="e.g. music, hiking, sci-fi movies" autocomplete="off" />
+
+    <button id="btn-start" class="btn-primary">
+      <span>Start listening</span>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+
+    <p class="safety-note">
+      You'll be paired with a random stranger over text. Be kind, never share personal
+      details, and use <strong>Report</strong> if something feels wrong. Signal is intended
+      for adults 18+ only.
+    </p>
+  </div>
+</section>
+
+<!-- ===== WAITING ===== -->
+<section id="screen-waiting" class="screen screen-waiting hidden">
+  <div class="waiting-inner">
+    <svg class="scan-wave" viewBox="0 0 300 100" aria-hidden="true">
+      <path class="scan-path" d="M0,50 Q15,10 30,50 T60,50 T90,50 T120,50 T150,50 T180,50 T210,50 T240,50 T270,50 T300,50" fill="none" stroke="var(--amber)" stroke-width="2.5"/>
+    </svg>
+    <p class="waiting-label">Scanning for a frequency<span class="dots"><span>.</span><span>.</span><span>.</span></span></p>
+    <button id="btn-cancel-wait" class="btn-ghost">Cancel</button>
+  </div>
+</section>
+
+<!-- ===== CHAT ===== -->
+<section id="screen-chat" class="screen screen-chat hidden">
+  <header class="chat-header">
+    <div class="status-block">
+      <span class="status-dot" id="status-dot"></span>
+      <div>
+        <div class="status-title" id="status-title">Locked on</div>
+        <div class="status-sub" id="status-sub">Stranger connected</div>
+      </div>
+    </div>
+    <div class="chat-actions">
+      <button id="btn-report" class="btn-icon" title="Report this conversation">Report</button>
+      <button id="btn-skip" class="btn-icon btn-icon-accent" title="Skip to next stranger">Next ⤍</button>
+      <button id="btn-leave" class="btn-icon" title="Leave chat">End</button>
+    </div>
+  </header>
+
+  <svg class="chat-wave" viewBox="0 0 600 30" preserveAspectRatio="none" aria-hidden="true">
+    <path id="chat-wave-path" d="M0,15 L600,15" fill="none" stroke="var(--signal)" stroke-width="1.5" opacity="0.5"/>
+  </svg>
+
+  <div id="messages" class="messages" aria-live="polite"></div>
+
+  <div class="typing-row" id="typing-row" aria-hidden="true">
+    <span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>
+    <span class="typing-text">stranger is typing</span>
+  </div>
+
+  <form id="message-form" class="message-form">
+    <input id="message-input" type="text" maxlength="1000" placeholder="Say something…" autocomplete="off" />
+    <button type="submit" class="btn-send" aria-label="Send message">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 9h13M10 4l5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </form>
+</section>
+
+<!-- ===== PARTNER LEFT MODAL ===== -->
+<div id="modal-partner-left" class="modal hidden">
+  <div class="modal-card">
+    <p>The stranger disconnected.</p>
+    <div class="modal-actions">
+      <button id="btn-modal-find" class="btn-primary">Find another</button>
+      <button id="btn-modal-close" class="btn-ghost">Back home</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== REPORT MODAL ===== -->
+<div id="modal-report" class="modal hidden">
+  <div class="modal-card">
+    <p>What happened?</p>
+    <div class="report-reasons">
+      <button class="report-reason" data-reason="Harassment or abusive language">Harassment / abuse</button>
+      <button class="report-reason" data-reason="Sexual content involving a minor or nonconsensual content">Sexual content</button>
+      <button class="report-reason" data-reason="Spam or scam">Spam / scam</button>
+      <button class="report-reason" data-reason="Other">Other</button>
+    </div>
+    <button id="btn-report-cancel" class="btn-ghost">Cancel</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
